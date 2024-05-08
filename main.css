@@ -1,0 +1,121 @@
+body{
+    margin: 0 3%;
+    background-color: #0c1017;
+}
+.grid{
+    margin: 0;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+}
+.task-container{
+   
+    display: flex;
+    justify-content: center ;
+    align-items: center;
+}
+.calendar-container{
+  
+    display: flex;
+    justify-content: center ;
+    align-items: center;
+}
+.tasks{
+    
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    background-color: #171b23;
+    height: 70%;
+    width: 15vw;
+    min-width:100px;
+    border-radius: 10px;
+    border: 1px solid rgb(63, 63, 63);
+}
+.tasks > div:first-of-type{
+   flex: 1;
+   margin-top: 40px;
+}
+.task-menu{
+    height: 12%;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+}
+
+.task{
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    width: 80%;
+    height: 12%;
+    min-height: 60px;
+    padding: 0 5%;
+    /* background-color: #13181f;
+    border: 1px solid rgb(90, 90, 90);
+    border-radius: 5px; */
+    border-radius: 15px;
+    margin: 20px 10px;
+    font-family: sans-serif;
+}
+.task:hover{
+
+ background-color: rgba(235, 234, 234, 0.103);
+}
+.task:hover  span{
+    color: white;
+}
+.task span{
+    font-size: 30px;
+    color: rgb(192, 191, 191);
+    
+}
+
+.add{
+    margin: 10px;
+   display:flex;
+   align-items: center;
+   justify-content: center;
+    width: 62px;
+    height: 62px;
+    border-radius: 10px;
+    background-color: rgba(235, 234, 234, 0.103);
+    cursor: pointer;
+}
+.add:hover .plus-sign::after,.add:hover .plus-sign::before{
+    background-color: rgb(235, 235, 235);
+   
+}
+.plus-sign {
+    
+    width: 30px;
+    height: 2px;
+    
+  }
+  
+  .plus-sign:before,
+  .plus-sign:after {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 3px;
+    border-radius: 20px;
+    background-color: rgb(119, 119, 119);
+  }
+  
+  .plus-sign:before {
+    transform: rotate(90deg);
+  }
+  
+  .plus-sign:after {
+    transform: rotate(180deg);
+  }
+  
+  .edit{
+    width: 50%; 
+    filter: brightness(50%); 
+  }
+  .add:hover .edit{
+    filter: brightness(100%); 
+  }
+  
