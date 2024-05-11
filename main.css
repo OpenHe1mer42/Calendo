@@ -1,6 +1,6 @@
 body{
     margin: 0 3%;
-    background-color: #0c1017;
+    background-color: #0c1017; 
 }
 .grid{
     margin: 0;
@@ -17,7 +17,7 @@ body{
 .calendar-container{
   
     display: flex;
-    justify-content: center ;
+    justify-content: start ;
     align-items: center;
 }
 .tasks{
@@ -119,3 +119,62 @@ body{
     filter: brightness(100%); 
   }
   
+  .calendar{
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 16px;
+    padding: 12px;
+    
+    height: 70%;
+    width: 60vw;
+    min-width:100px;
+   
+  }
+  .date {
+   background-color: #010508;
+    border: 1px solid #4b4b4b;
+    border-radius: 20px;
+    padding: 10px;
+    box-sizing: border-box;
+    text-align: center;
+    display: flex;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.date div{
+    display: flex;
+   
+    flex-direction: column;
+    justify-content: space-between;
+}
+.date_text{
+    color: rgb(153, 153, 153);
+    font-size: 30px;
+    font-family: sans-serif;
+}
+.day_text{
+    color: rgb(153, 153, 153);
+    font-size: 30px;
+    font-family: sans-serif;
+}
+.date:hover{
+    background-color:#0c1017;
+    transform: scale(1.6);
+    box-shadow: 0px 0px 8px rgba(134, 134, 134, 0.3);
+    z-index: 1;
+}
+.date:hover .date_text{
+    color: white;
+}
+
+.day_text{
+    align-self: end;
+    justify-self: start;
+    opacity: 10%;
+    font-size: 20px;
+    text-align: start;
+}
+.date:hover .day_text{
+    opacity: 1;
+}
