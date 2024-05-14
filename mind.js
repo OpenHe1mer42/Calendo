@@ -81,12 +81,56 @@ function generateDates(month, year) {
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 // Generate dates for May 2024
-generateDates(5, 2024);
-
-Start();
 
 
-function Start() {
+function initializeDateControl() {
     
+    const control = document.getElementById('control');
+    if (control) { // Check if control element is found
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
 
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        document.getElementById('month').textContent = monthNames[currentMonth];
+        document.getElementById('next_month').textContent = monthNames[currentMonth+1];
+        document.getElementById('prev_month').textContent = monthNames[currentMonth-1];
+        document.getElementById('year').textContent = currentYear;
+        document.getElementById('next_year').textContent = currentYear+1;
+        document.getElementById('prev_year').textContent = currentYear-1;
+        generateDates(currentMonth + 1, currentYear);
+        control.addEventListener('wheel', function(event) {
+            event.preventDefault();
+            const delta = Math.sign(event.deltaY); // Get scroll direction
+           
+            if (event.target.classList.contains('moncon')) {
+                currentMonth -= delta;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                } else if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                document.getElementById('month').textContent = monthNames[currentMonth];
+                document.getElementById('next_month').textContent = monthNames[currentMonth+1];
+                document.getElementById('prev_month').textContent = monthNames[currentMonth-1];
+                generateDates(currentMonth + 1, currentYear);
+                
+            } else if (event.target.classList.contains('yearcon')) {
+                currentYear -= delta;
+                document.getElementById('year').textContent = currentYear;
+                document.getElementById('next_year').textContent = currentYear+1;
+                document.getElementById('prev_year').textContent = currentYear-1;
+                generateDates(currentMonth + 1, currentYear);
+               
+            }
+        });
+    } else {
+        console.error("Element with ID 'control' not found.");
+    }
+    
 }
+
+document.addEventListener('DOMContentLoaded', initializeDateControl);

@@ -128,6 +128,7 @@ body{
     padding: 12px;
     margin-top: 4%;
     height: 70%;
+    min-height: 500px;
     width: 60vw;
     min-width:100px;
    
@@ -200,20 +201,77 @@ body{
 .calendarcontrol{
     justify-self: flex-end;
     display: flex;
-    align-items: center;
+    align-items: start;
     justify-content: end;
     height: 8%;
     width: 80%;
 }
 .control{
-    margin-top: 10px;
-    color: rgb(172, 172, 172);
+   width: 150px;
+  
+    color: rgb(145, 145, 145);
     font-family: sans-serif;
     font-size: 25px;
     cursor: pointer;
-   
+   padding: 10px 0px 50px 80px;
+   position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items:center;
 }
 
-.moncon + span{
-    color: #5e5e5e;
+.control div + span{
+    color: #414141;
 }
+
+.moncon:hover,.yearcon:hover{
+    color: rgb(255, 255, 255);
+
+}
+
+.other {
+    font-size: 17px;
+    color: #0c1017;
+    transition: color 0.8s ease; /* Smooth transition for color change */
+    opacity: 0; /* Initial opacity */
+    transition: opacity 0.3s ease; /* Smooth transition for opacity change */
+}
+
+.control:hover .other {
+    color: rgb(78, 78, 78); /* Change color on hover */
+    opacity: 0.7; /* Change opacity on hover */
+}
+
+
+
+.moncon,
+.yearcon {
+        position: relative;
+        margin: 7px 0;
+}
+
+    .moncon::after,
+    .yearcon::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -5px;
+        width: 0;
+        height: 2px;
+        background-color: rgb(110, 110, 110);
+        transition: width 0.3s ease;
+    }
+
+    .control:hover .moncon::after {
+        width: 100%;
+    }
+
+    .control:hover .yearcon::after {
+        width: 100%;
+    }
+
+    .control div{
+        display: flex;
+        flex-direction: column;
+    }
+   
