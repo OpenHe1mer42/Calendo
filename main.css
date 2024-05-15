@@ -274,4 +274,17 @@ body{
         display: flex;
         flex-direction: column;
     }
-   
+
+    /* this bwlow is the selected element */
+    .x-sign{
+        font-family: Arial, Helvetica, sans-serif;
+       color: #afafaf;
+        align-self: center;
+        width: 100%;
+       font-size: 50px;
+
+    }
+
+    .selected{
+       background-color: #171b23 !important;
+    }

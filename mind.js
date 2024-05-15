@@ -75,13 +75,65 @@ function generateDates(month, year) {
 
     // Append HTML to calendar
     calendarDiv.innerHTML = `<div class="week">${html}</div>`;
+    addEventListeners()
 }
 
 // Weekday names array
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 // Generate dates for May 2024
+// Function to add event listeners to date elements
+// Function to add event listeners to date elements and handle localStorage
+function addEventListeners() {
+    const dateElements = document.querySelectorAll('.date');
 
+    dateElements.forEach(dateElement => {
+        dateElement.addEventListener('click', () => {
+            dateElement.classList.toggle('selected');
+            const dateText = dateElement.querySelector('.date_text');
+            const date = dateText ? dateText.textContent : null;
+            if (date) {
+          
+                const monthElement = document.querySelector('.moncon');
+                const yearElement = document.querySelector('.yearcon');
+                const yearmonth = yearElement ? yearElement.textContent : '';
+                const monthYear = monthElement ? monthElement.textContent : '';
+                const key = `${yearmonth}_${monthYear}_${date}`; // Unique key for each date
+                if (dateElement.classList.contains('selected')) {
+                    dateElement.innerHTML += '<span class="x-sign">X</span>';
+                 
+                    localStorage.setItem(key, 'selected');
+                    // Add your additional class lists here as needed
+                } else {
+                    const xSign = dateElement.querySelector('.x-sign');
+                    if (xSign) {
+                        xSign.remove();
+                    }
+                    localStorage.removeItem(key);
+                    // Remove any additional class lists here if needed
+                }
+            }
+        });
+        
+        // Check localStorage for saved selections on page load
+        const dateText = dateElement.querySelector('.date_text');
+        const date = dateText ? dateText.textContent : null;
+        if (date) {
+            
+            const monthElement = document.querySelector('.moncon');
+            const yearElement = document.querySelector('.yearcon');
+            const yearmonth = yearElement ? yearElement.textContent : '';
+            const monthYear = monthElement ? monthElement.textContent : '';
+            const key = `${yearmonth}_${monthYear}_${date}`; // Unique key for each date
+            if (localStorage.getItem(key) === 'selected') {
+                dateElement.classList.add('selected');
+            
+                dateElement.innerHTML += '<span class="x-sign">X</span>';
+                // Add your additional class lists here as needed
+            }
+        }
+    });
+}
 
 function initializeDateControl() {
     
