@@ -101,11 +101,11 @@ function addEventListeners() {
 
                 // Determine whether the clicked date is from the previous month or next month
                 if (dateElement.id === 'prev-month') {
-                    key = `${yearmonth}_${currentMonth-1}_${date}`; // Save as the next month
+                    key = `${yearmonth}_${currentMonth}_${date}`; // Save as the next month
                 } else if (dateElement.id === 'next-month') {
-                    key = `${yearmonth}_${currentMonth+1}_${date}`; // Save as the previous month
+                    key = `${yearmonth}_${currentMonth+2}_${date}`; // Save as the previous month
                 } else {
-                    key = `${yearmonth}_${currentMonth}_${date}`; // Save as the current month
+                    key = `${yearmonth}_${currentMonth+1}_${date}`; // Save as the current month
                 }
                 console.log(currentMonth);
                 if (dateElement.classList.contains('selected')) {
@@ -135,11 +135,11 @@ function addEventListeners() {
 
             // Determine whether the date is from the previous month or next month
             if (dateElement.id === 'prev-month') {
-                key = `${yearmonth}_${currentMonth-1}_${date}`; // Check for the next month
+                key = `${yearmonth}_${currentMonth}_${date}`; // Check for the next month
             } else if (dateElement.id === 'next-month') {
-                key = `${yearmonth}_${currentMonth+1}_${date}`; // Check for the previous month
+                key = `${yearmonth}_${currentMonth+2}_${date}`; // Check for the previous month
             } else {
-                key = `${yearmonth}_${currentMonth}_${date}`; // Check for the current month
+                key = `${yearmonth}_${currentMonth+1}_${date}`; // Check for the current month
             }
 
             if (localStorage.getItem(key) === 'selected') {
@@ -151,12 +151,13 @@ function addEventListeners() {
     });
 }
 let currentMonth;
+let currentYear;
 function initializeDateControl() {
     
     const control = document.getElementById('control');
     if (control) { // Check if control element is found
         currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
+        currentYear = new Date().getFullYear();
 
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
