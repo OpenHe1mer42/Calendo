@@ -92,20 +92,17 @@ function addEventListeners() {
             const dateText = dateElement.querySelector('.date_text');
             const date = dateText ? dateText.textContent : null;
             if (date) {
-                const monthElement = document.querySelector('.moncon');
-                const yearElement = document.querySelector('.yearcon');
-                const yearmonth = yearElement ? yearElement.textContent : '';
-                const monthYear = monthElement ? monthElement.textContent : '';
+                
                
                 let key;
 
                 // Determine whether the clicked date is from the previous month or next month
                 if (dateElement.id === 'prev-month') {
-                    key = `${yearmonth}_${currentMonth}_${date}`; // Save as the next month
+                    currentMonth === 0 ? (key = `${currentYear - 1}_12_${date}`) : (key = `${currentYear}_${currentMonth}_${date}`);
                 } else if (dateElement.id === 'next-month') {
-                    key = `${yearmonth}_${currentMonth+2}_${date}`; // Save as the previous month
+                    currentMonth === 11 ? (key = `${currentYear + 1}_1_${date}`) : (key = `${currentYear}_${currentMonth + 2}_${date}`);// Save as the previous month
                 } else {
-                    key = `${yearmonth}_${currentMonth+1}_${date}`; // Save as the current month
+                    key = `${currentYear}_${currentMonth+1}_${date}`; // Save as the current month
                 }
                 console.log(currentMonth);
                 if (dateElement.classList.contains('selected')) {
@@ -127,19 +124,16 @@ function addEventListeners() {
         const dateText = dateElement.querySelector('.date_text');
         const date = dateText ? dateText.textContent : null;
         if (date) {
-            const monthElement = document.querySelector('.moncon');
-            const yearElement = document.querySelector('.yearcon');
-            const yearmonth = yearElement ? yearElement.textContent : '';
-            const monthYear = monthElement ? monthElement.textContent : '';
+           
             let key;
 
             // Determine whether the date is from the previous month or next month
             if (dateElement.id === 'prev-month') {
-                key = `${yearmonth}_${currentMonth}_${date}`; // Check for the next month
+                currentMonth === 0 ? (key = `${currentYear - 1}_12_${date}`) : (key = `${currentYear}_${currentMonth}_${date}`); //this makes sure so the days remain selected even if years overlap so jan an dec of a 2 dif years
             } else if (dateElement.id === 'next-month') {
-                key = `${yearmonth}_${currentMonth+2}_${date}`; // Check for the previous month
+                currentMonth === 11 ? (key = `${currentYear + 1}_1_${date}`) : (key = `${currentYear}_${currentMonth + 2}_${date}`); // Check for the previous month
             } else {
-                key = `${yearmonth}_${currentMonth+1}_${date}`; // Check for the current month
+                key = `${currentYear}_${currentMonth+1}_${date}`; // Check for the current month
             }
 
             if (localStorage.getItem(key) === 'selected') {
