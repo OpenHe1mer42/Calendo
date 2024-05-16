@@ -28,7 +28,7 @@ function generateDates(month, year) {
     for (let i = daysInPrevMonth - daysFromPrevMonth + 1; i <= daysInPrevMonth; i++) {
         const date = new Date(year, month - 2, i);
         const dayIndex = date.getDay();
-        html += `<div class="date prev-month"><div>
+        html += `<div id="prev-month" class="date prev-month"><div>
         <span class="date_text">
         ${i}</span>
         <br>
@@ -65,7 +65,7 @@ function generateDates(month, year) {
     for (let i = 1; i <= daysFromNextMonth; i++) {
         const date = new Date(year, month , i);
         const dayIndex = date.getDay();
-        html += `<div class="date prev-month"><div>
+        html += `<div id="next-month" class="date prev-month"><div>
         <span class="date_text">
         ${i}</span>
         <br>
@@ -81,8 +81,7 @@ function generateDates(month, year) {
 // Weekday names array
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-// Generate dates for May 2024
-// Function to add event listeners to date elements
+
 // Function to add event listeners to date elements and handle localStorage
 function addEventListeners() {
     const dateElements = document.querySelectorAll('.date');
@@ -93,15 +92,24 @@ function addEventListeners() {
             const dateText = dateElement.querySelector('.date_text');
             const date = dateText ? dateText.textContent : null;
             if (date) {
-          
                 const monthElement = document.querySelector('.moncon');
                 const yearElement = document.querySelector('.yearcon');
                 const yearmonth = yearElement ? yearElement.textContent : '';
                 const monthYear = monthElement ? monthElement.textContent : '';
-                const key = `${yearmonth}_${monthYear}_${date}`; // Unique key for each date
+               
+                let key;
+
+                // Determine whether the clicked date is from the previous month or next month
+                if (dateElement.id === 'prev-month') {
+                    key = `${yearmonth}_${currentMonth-1}_${date}`; // Save as the next month
+                } else if (dateElement.id === 'next-month') {
+                    key = `${yearmonth}_${currentMonth+1}_${date}`; // Save as the previous month
+                } else {
+                    key = `${yearmonth}_${currentMonth}_${date}`; // Save as the current month
+                }
+                console.log(currentMonth);
                 if (dateElement.classList.contains('selected')) {
                     dateElement.innerHTML += '<span class="x-sign">X</span>';
-                 
                     localStorage.setItem(key, 'selected');
                     // Add your additional class lists here as needed
                 } else {
@@ -114,32 +122,40 @@ function addEventListeners() {
                 }
             }
         });
-        
+
         // Check localStorage for saved selections on page load
         const dateText = dateElement.querySelector('.date_text');
         const date = dateText ? dateText.textContent : null;
         if (date) {
-            
             const monthElement = document.querySelector('.moncon');
             const yearElement = document.querySelector('.yearcon');
             const yearmonth = yearElement ? yearElement.textContent : '';
             const monthYear = monthElement ? monthElement.textContent : '';
-            const key = `${yearmonth}_${monthYear}_${date}`; // Unique key for each date
+            let key;
+
+            // Determine whether the date is from the previous month or next month
+            if (dateElement.id === 'prev-month') {
+                key = `${yearmonth}_${currentMonth-1}_${date}`; // Check for the next month
+            } else if (dateElement.id === 'next-month') {
+                key = `${yearmonth}_${currentMonth+1}_${date}`; // Check for the previous month
+            } else {
+                key = `${yearmonth}_${currentMonth}_${date}`; // Check for the current month
+            }
+
             if (localStorage.getItem(key) === 'selected') {
                 dateElement.classList.add('selected');
-            
                 dateElement.innerHTML += '<span class="x-sign">X</span>';
                 // Add your additional class lists here as needed
             }
         }
     });
 }
-
+let currentMonth;
 function initializeDateControl() {
     
     const control = document.getElementById('control');
     if (control) { // Check if control element is found
-        let currentMonth = new Date().getMonth();
+        currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
 
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -161,9 +177,15 @@ function initializeDateControl() {
                 if (currentMonth < 0) {
                     currentMonth = 11;
                     currentYear--;
+                    document.getElementById('year').textContent = currentYear;
+                    document.getElementById('next_year').textContent = currentYear+1;
+                    document.getElementById('prev_year').textContent = currentYear-1;
                 } else if (currentMonth > 11) {
                     currentMonth = 0;
                     currentYear++;
+                    document.getElementById('year').textContent = currentYear;
+                    document.getElementById('next_year').textContent = currentYear+1;
+                    document.getElementById('prev_year').textContent = currentYear-1;
                 }
                 document.getElementById('month').textContent = monthNames[currentMonth];
                 document.getElementById('next_month').textContent = monthNames[currentMonth+1];
