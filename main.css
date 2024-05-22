@@ -36,6 +36,10 @@ body{
 .tasks > div:first-of-type{
    flex: 1;
    margin-top: 40px;
+   overflow-y: scroll;
+   overflow-x: hidden;
+   scrollbar-color: rgb(19, 25, 36) #010508;
+  scrollbar-width: thin;
 }
 .task-menu{
     height: 12%;
@@ -135,7 +139,7 @@ body{
   }
   .date {
    background-color: #010508;
-    border: 1px solid #4b4b4b;
+    border: 1px solid #202020;
     border-radius: 20px;
     padding: 10px;
     box-sizing: border-box;
@@ -163,6 +167,7 @@ body{
 }
 .date:hover{
     background-color:#0c1017;
+    border: 1px solid #797979;
     transform: scale(1.6);
     box-shadow: 0px 0px 8px rgba(134, 134, 134, 0.3);
     z-index: 1;
@@ -191,7 +196,7 @@ body{
 
 .prev-month{
     background-color: #01050827;
-    border: 1px solid #363636;
+    border: 1px solid #1b1b1b;
 }
 .prev-month > div > .date_text{
     color: rgb(112, 112, 112);
@@ -288,3 +293,9 @@ body{
     .selected{
        background-color: #171b23 !important;
     }
+
+
+    .selectedtask {
+        background-color: rgba(160, 160, 160, 0.199) !important;
+     
+      }

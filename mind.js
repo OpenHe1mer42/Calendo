@@ -203,3 +203,61 @@ function initializeDateControl() {
 }
 
 document.addEventListener('DOMContentLoaded', initializeDateControl);
+document.addEventListener("DOMContentLoaded", function() {
+    const addBtn = document.getElementById('add');
+    const tasksDiv = document.getElementById('tasksdiv');
+    const deleteBtn = document.getElementById('delete');
+    const editBtn = document.getElementById('edit');
+
+    addBtn.addEventListener('click', function() {
+        const newTask = document.createElement('div');
+        newTask.classList.add('task');
+        newTask.innerHTML = '<span>New Task</span>';
+        tasksDiv.appendChild(newTask);
+    });
+
+    tasksDiv.addEventListener('click', function(event) {
+        const selectedTask = event.target.closest('.task');
+        if (selectedTask) {
+            if (selectedTask.classList.contains('selectedtask')) {
+                selectedTask.classList.remove('selectedtask');
+            } else {
+                const allTasks = document.querySelectorAll('.task');
+                allTasks.forEach(task => task.classList.remove('selectedtask'));
+                selectedTask.classList.add('selectedtask');
+            }
+        }
+    });
+
+    deleteBtn.addEventListener('click', function() {
+        const selectedTask = document.querySelector('.task.selectedtask');
+        if (selectedTask) {
+            const nextTask = selectedTask.nextElementSibling || selectedTask.previousElementSibling;
+            selectedTask.remove();
+            if (nextTask) {
+                nextTask.classList.add('selectedtask');
+            }
+        }
+    });
+
+    editBtn.addEventListener('click', function() {
+        const selectedTask = document.querySelector('.task.selectedtask');
+        if (selectedTask) {
+            const taskText = selectedTask.querySelector('span');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = taskText.textContent;
+            selectedTask.replaceChild(input, taskText);
+    
+            input.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Prevent default form submission behavior
+                    taskText.textContent = input.value;
+                    selectedTask.removeChild(input);
+                }
+            });
+    
+            input.focus(); // Focus on the input field when editing starts
+        }
+    });
+});
