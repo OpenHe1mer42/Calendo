@@ -14,15 +14,16 @@ function generateDates(month, year) {
 
     // Generate date elements
     let html = '';
+    let weekCount = 0;
 
     // Get the first day of the month
     const firstDayOfMonth = new Date(year, month - 1, 1).getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
 
     // Calculate the number of days from the previous month to display
-    const daysFromPrevMonth = (firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1); // Number of days to display from the previous month
-    const prevMonth = month === 1 ? 12 : month - 1; // Previous month
-    const prevYear = month === 1 ? year - 1 : year; // Year of the previous month
-    const daysInPrevMonth = daysInMonth(prevMonth, prevYear); // Total days in the previous month
+    const daysFromPrevMonth = (firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1); 
+    const prevMonth = month === 1 ? 12 : month - 1;
+    const prevYear = month === 1 ? year - 1 : year; 
+    const daysInPrevMonth = daysInMonth(prevMonth, prevYear);
 
     // Generate dates from the previous month
     for (let i = daysInPrevMonth - daysFromPrevMonth + 1; i <= daysInPrevMonth; i++) {
@@ -41,16 +42,19 @@ function generateDates(month, year) {
     for (let i = 1; i <= days; i++) {
         const date = new Date(year, month - 1, i);
         const dayIndex = date.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
+        const isToday = date.getDate() === new Date().getDate() && date.getMonth() === new Date().getMonth() && date.getFullYear() === new Date().getFullYear();
         if (dayIndex === 1 && i !== 1) {
             html += `</div><div class="week">`; // Start a new row for Monday
+            weekCount++;
         }
-        html += `<div class="date">
+        let dateHtml = `<div class="date${isToday ? ' today-date' : ''}">
         <div>
         <span class="date_text">
         ${i}</span>
         <br>
         <span class="day_text">${dayNames[dayIndex]}</span></div>
         </div>`; // Include day of the week
+        html += dateHtml;
     }
 
     // Get the last day of the month
@@ -75,6 +79,14 @@ function generateDates(month, year) {
 
     // Append HTML to calendar
     calendarDiv.innerHTML = `<div class="week">${html}</div>`;
+ 
+    if (weekCount >= 5) {
+        const weeks = calendarDiv.querySelectorAll('.week');
+        if (weeks.length > 5 ) {
+            weeks[weeks.length - 1].remove();
+        }
+    }
+    console.log(weekCount)
     addEventListeners()
 }
 
@@ -212,52 +224,89 @@ document.addEventListener("DOMContentLoaded", function() {
     addBtn.addEventListener('click', function() {
         const newTask = document.createElement('div');
         newTask.classList.add('task');
-        newTask.innerHTML = '<span>New Task</span>';
+        newTask.innerHTML = '<span>New Habit</span>';
         tasksDiv.appendChild(newTask);
-    });
+        });
 
-    tasksDiv.addEventListener('click', function(event) {
-        const selectedTask = event.target.closest('.task');
-        if (selectedTask) {
-            if (selectedTask.classList.contains('selectedtask')) {
-                selectedTask.classList.remove('selectedtask');
-            } else {
-                const allTasks = document.querySelectorAll('.task');
-                allTasks.forEach(task => task.classList.remove('selectedtask'));
-                selectedTask.classList.add('selectedtask');
-            }
-        }
-    });
-
-    deleteBtn.addEventListener('click', function() {
-        const selectedTask = document.querySelector('.task.selectedtask');
-        if (selectedTask) {
-            const nextTask = selectedTask.nextElementSibling || selectedTask.previousElementSibling;
-            selectedTask.remove();
-            if (nextTask) {
-                nextTask.classList.add('selectedtask');
-            }
-        }
-    });
-
-    editBtn.addEventListener('click', function() {
-        const selectedTask = document.querySelector('.task.selectedtask');
-        if (selectedTask) {
-            const taskText = selectedTask.querySelector('span');
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = taskText.textContent;
-            selectedTask.replaceChild(input, taskText);
-    
-            input.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault(); // Prevent default form submission behavior
-                    taskText.textContent = input.value;
-                    selectedTask.removeChild(input);
+        tasksDiv.addEventListener('click', function(event) {
+            const selectedTask = event.target.closest('.task');
+            if (selectedTask) {
+                if (selectedTask.classList.contains('selectedtask')) {
+                    
+                } else {
+                    const allTasks = document.querySelectorAll('.task');
+                    allTasks.forEach(task => task.classList.remove('selectedtask'));
+                    selectedTask.classList.add('selectedtask');
                 }
-            });
-    
-            input.focus(); // Focus on the input field when editing starts
-        }
+            }
+        });
+
+        deleteBtn.addEventListener('click', function() {
+            const selectedTask = document.querySelector('.task.selectedtask');
+            if (selectedTask) {
+                const nextTask = selectedTask.nextElementSibling || selectedTask.previousElementSibling;
+                selectedTask.remove();
+                if (nextTask) {
+                    nextTask.classList.add('selectedtask');
+                }
+            }
+        });
+
+        editBtn.addEventListener('click', function() {
+            const selectedTask = document.querySelector('.task.selectedtask');
+            if (selectedTask) {
+                const taskText = selectedTask.querySelector('span');
+                const input = document.createElement('input');
+                input.type = 'text';
+                
+                // Apply styles to the input field to match the span
+                input.style.fontFamily = window.getComputedStyle(taskText).fontFamily;
+                input.style.fontSize = window.getComputedStyle(taskText).fontSize;
+                input.style.color = 'white';
+                input.style.background = 'none';
+                input.style.border = 'none';
+                input.style.borderBottom = '1px solid white';
+                input.style.outline = 'none';
+        
+                input.value = taskText.textContent;
+                selectedTask.replaceChild(input, taskText);
+        
+                // Function to save the edited task name and put it in the initial span
+                function saveTaskName() {
+                    if (input.value.trim() === '') {
+                        taskText.textContent = 'Habit';
+                    } else {
+                        taskText.textContent = input.value;
+                    }
+                    selectedTask.replaceChild(taskText, input);
+                }
+        
+                input.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault(); 
+                        saveTaskName();
+                    }
+                });
+        
+                input.addEventListener('blur', function() {
+                    saveTaskName();
+                });
+        
+                input.focus(); // Focus on the input field when editing starts
+            }
+        });
     });
-});
+    function scrollToCurrentDate() {
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1;
+        const currentYear = currentDate.getFullYear();
+    
+        generateDates(currentMonth, currentYear);
+        addEventListeners(); // Reattach event listeners after generating dates
+        addTasksEventListeners(); // Reattach event listeners for tasks
+    }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        const todaySpan = document.getElementById('today');
+        todaySpan.addEventListener('click', scrollToCurrentDate);
+    });
