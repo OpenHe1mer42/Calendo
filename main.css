@@ -67,10 +67,10 @@ html{
 
 .task{
     display: flex;
-    cursor: pointer;
+    cursor: grab;
     align-items: center;
     width: 80%;
-  
+    
     height: 12%;
     min-height: 60px;
     padding: 0 5%;
@@ -81,6 +81,14 @@ html{
     margin: 20px 10px;
     font-family: sans-serif;
 }
+.task.dragging {
+    opacity: .3;
+    cursor: grabbing;
+    background-color: #010508;
+}
+
+
+
 .task:hover{
 
  background-color: rgba(235, 234, 234, 0.075);

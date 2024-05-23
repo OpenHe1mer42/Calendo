@@ -248,25 +248,51 @@ if (todaySpan) {
 
 
 document.addEventListener('DOMContentLoaded', initializeDateControl);
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener('DOMContentLoaded', function() {
     const addBtn = document.getElementById('add');
     const tasksDiv = document.getElementById('tasksdiv');
     const deleteBtn = document.getElementById('delete');
     const editBtn = document.getElementById('edit');
 
+    // Function to load tasks from localStorage
+    function loadTasks() {
+        tasksDiv.innerHTML = '';
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks.forEach(task => {
+            const taskDiv = document.createElement('div');
+            taskDiv.classList.add('task');
+            taskDiv.setAttribute('draggable', true);
+            taskDiv.innerHTML = `<span>${task}</span>`;
+            tasksDiv.appendChild(taskDiv);
+        });
+        addDragAndDrop();
+    }
+
+    // Function to save tasks to localStorage
+    function saveTasks() {
+        const tasks = [];
+        document.querySelectorAll('.task span').forEach(task => {
+            tasks.push(task.textContent);
+        });
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    // Add a new task
     addBtn.addEventListener('click', function() {
         const newTask = document.createElement('div');
         newTask.classList.add('task');
+        newTask.setAttribute('draggable', true);
         newTask.innerHTML = '<span>New Habit</span>';
         tasksDiv.appendChild(newTask);
+        saveTasks();
+        addDragAndDrop();
     });
 
+    // Select a task
     tasksDiv.addEventListener('click', function(event) {
         const selectedTask = event.target.closest('.task');
         if (selectedTask) {
-            if (selectedTask.classList.contains('selectedtask')) {
-                
-            } else {
+            if (!selectedTask.classList.contains('selectedtask')) {
                 const allTasks = document.querySelectorAll('.task');
                 allTasks.forEach(task => task.classList.remove('selectedtask'));
                 selectedTask.classList.add('selectedtask');
@@ -274,20 +300,25 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    // Delete a selected task
     deleteBtn.addEventListener('click', function() {
         const selectedTask = document.querySelector('.task.selectedtask');
         if (selectedTask) {
             const nextTask = selectedTask.nextElementSibling || selectedTask.previousElementSibling;
             selectedTask.remove();
+            saveTasks();
             if (nextTask) {
                 nextTask.classList.add('selectedtask');
             }
         }
     });
 
+    // Edit a selected task
     editBtn.addEventListener('click', function() {
         const selectedTask = document.querySelector('.task.selectedtask');
         if (selectedTask) {
+            selectedTask.setAttribute('draggable', false); // Make task non-draggable
+
             const taskText = selectedTask.querySelector('span');
             const input = document.createElement('input');
             input.type = 'text';
@@ -312,6 +343,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     taskText.textContent = input.value;
                 }
                 selectedTask.replaceChild(taskText, input);
+                saveTasks();
+                selectedTask.setAttribute('draggable', true); // Restore task to be draggable
             }
 
             input.addEventListener('keydown', function(event) {
@@ -328,4 +361,47 @@ document.addEventListener("DOMContentLoaded", function() {
             input.focus(); // Focus on the input field when editing starts
         }
     });
+
+    // Add drag and drop functionality to tasks
+    function addDragAndDrop() {
+        const tasks = document.querySelectorAll('.task');
+
+        tasks.forEach(task => {
+            task.addEventListener('dragstart', () => {
+                task.classList.add('dragging');
+            });
+
+            task.addEventListener('dragend', () => {
+                task.classList.remove('dragging');
+                saveTasks();
+            });
+        });
+
+        tasksDiv.addEventListener('dragover', event => {
+            event.preventDefault();
+            const afterElement = getDragAfterElement(tasksDiv, event.clientY);
+            const draggingTask = document.querySelector('.dragging');
+            if (afterElement == null) {
+                tasksDiv.appendChild(draggingTask);
+            } else {
+                tasksDiv.insertBefore(draggingTask, afterElement);
+            }
+        });
+    }
+
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.task:not(.dragging)')];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    loadTasks();
 });
