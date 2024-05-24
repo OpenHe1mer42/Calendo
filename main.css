@@ -5,6 +5,8 @@ body{
 }
 *{
     user-select: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    outline: none;
 }
 html{
     scrollbar-color: rgb(19, 25, 36) #010508;
@@ -23,7 +25,7 @@ html{
     display: flex;
     justify-content: center ;
     align-items: center;
-    
+    margin-bottom: 50px;
 }
 .calendar-container{
   
@@ -57,6 +59,10 @@ html{
    scrollbar-color: rgb(19, 25, 36) #010508;
   scrollbar-width: thin;
 }
+#tasksdiv::-webkit-scrollbar-thumb {
+    background-color: #888; /* Set the color of the scrollbar thumb */
+    border-radius: 10px; /* Add border radius */
+  }
 .task-menu{
     margin-top: 10px;
     height: 12%;
@@ -161,11 +167,11 @@ html{
     display: flex;
     flex-wrap: wrap;
     grid-template-columns: repeat(7, 1fr);
-    gap: 16px;
-    padding: 12px;
-    margin-top: 4%;
-    height: 70%;
-    min-height: 500px;
+    gap: 12px;
+    margin: 30px 12px;
+    
+    height: 68%;
+    min-height: 300px;
     width: 60vw;
     min-width:100px;
    
@@ -251,7 +257,7 @@ html{
     width: 80%;
     min-width: 750px;
 }
-.calendarcontrol div:first-of-type{
+.calendarcontrol div:first-child{
     margin-left: 10px;
     display: flex;
     align-items: end;
@@ -259,12 +265,14 @@ html{
     cursor: pointer;
     height: 100%;
 }
-.calendarcontrol div:first-of-type span{
+ .today{
  font-family:sans-serif;
  font-size: 20px;
  color: #636363;
+ margin-bottom: 10px;
+margin-top: 50px;
 }
-.calendarcontrol div:first-of-type span:hover{
+.calendarcontrol div:first-of-type .today:hover{
     color: white;
 }
 .control{
@@ -370,6 +378,13 @@ html{
         margin: 0;            /* Remove margin */
         line-height: inherit; /* Ensure line height matches the span */
         vertical-align: bottom; /* Align input to the bottom to match the span */
+    }
+
+    @media(max-height: 750px) {
+        .today{
+            margin-bottom: -10px;
+            position: relative;
+        }
     }
 
     

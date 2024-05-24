@@ -102,32 +102,48 @@ function addEventListeners() {
             const date = dateText ? dateText.textContent : null;
             if (date) {
                 let key;
-
+                const selectedTask = document.querySelector('.task.selectedtask');
+                const trimmedDate = date.trim();
                 // Determine whether the clicked date is from the previous month or next month
                 if (dateElement.id === 'prev-month') {
-                    currentMonth === 0 ? (key = `${currentYear - 1}_12_${date}`) : (key = `${currentYear}_${currentMonth}_${date}`);
+                    currentMonth === 0 ? (key = `${currentYear - 1}_12_${trimmedDate}`) : (key = `${currentYear}_${currentMonth}_${trimmedDate}`);
                 } else if (dateElement.id === 'next-month') {
-                    currentMonth === 11 ? (key = `${currentYear + 1}_1_${date}`) : (key = `${currentYear}_${currentMonth + 2}_${date}`);// Save as the previous month
+                    currentMonth === 11 ? (key = `${currentYear + 1}_1_${trimmedDate}`) : (key = `${currentYear}_${currentMonth + 2}_${trimmedDate}`);// Save as the previous month
                 } else {
-                    key = `${currentYear}_${currentMonth + 1}_${date}`; // Save as the current month
+                    key = `${currentYear}_${currentMonth + 1}_${trimmedDate}`; // Save as the current month
                 }
-                console.log(currentMonth);
+                console.log(date);
+                if (selectedTask) {
+                    const taskId = selectedTask.getAttribute('data-task-id');
+                    let taskDates = JSON.parse(localStorage.getItem(taskId)) || [];
+                   
+                    if (dateElement.classList.contains('selected')) {
+                        taskDates.push(key);
+                    } else {
+                        taskDates = taskDates.filter(d => d !== key);
+                        
+                    }
+                    localStorage.setItem(taskId, JSON.stringify(taskDates));
+                }
+
+                //this stays here to make the x sign cuz i cant figure out a better way to get involed in hte 
                 if (dateElement.classList.contains('selected')) {
                     dateElement.innerHTML += '<span class="x-sign">X</span>';
-                    localStorage.setItem(key, 'selected');
-                    // Add your additional class lists here as needed
+                   
+                    
                 } else {
                     const xSign = dateElement.querySelector('.x-sign');
                     if (xSign) {
                         xSign.remove();
                     }
                     localStorage.removeItem(key);
-                    // Remove any additional class lists here if needed
+                    
                 }
             }
         });
 
         // Check localStorage for saved selections on page load
+        const selectedTask = document.querySelector('.task.selectedtask');
         const dateText = dateElement.querySelector('.date_text');
         const date = dateText ? dateText.textContent : null;
         if (date) {
@@ -141,12 +157,18 @@ function addEventListeners() {
             } else {
                 key = `${currentYear}_${currentMonth + 1}_${date}`; // Check for the current month
             }
-
-            if (localStorage.getItem(key) === 'selected') {
-                dateElement.classList.add('selected');
-                dateElement.innerHTML += '<span class="x-sign">X</span>';
-                // Add your additional class lists here as needed
+            if (selectedTask) {
+                const taskId = selectedTask.getAttribute('data-task-id');
+                const taskDates = JSON.parse(localStorage.getItem(taskId)) || [];
+                dateElements.forEach(dateElement => {
+                   
+                    if (taskDates.includes(key)) {
+                        dateElement.classList.add('selected');
+                        dateElement.innerHTML += '<span class="x-sign">X</span>';
+                    }
+                });
             }
+           
         }
     });
 }
@@ -317,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
     editBtn.addEventListener('click', function() {
         const selectedTask = document.querySelector('.task.selectedtask');
         if (selectedTask) {
-            selectedTask.setAttribute('draggable', false); // Make task non-draggable
+            selectedTask.setAttribute('draggable', false); // Make task non-draggable because u wanna fix the name 
 
             const taskText = selectedTask.querySelector('span');
             const input = document.createElement('input');
@@ -344,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 selectedTask.replaceChild(taskText, input);
                 saveTasks();
-                selectedTask.setAttribute('draggable', true); // Restore task to be draggable
+                selectedTask.setAttribute('draggable', true); 
             }
 
             input.addEventListener('keydown', function(event) {

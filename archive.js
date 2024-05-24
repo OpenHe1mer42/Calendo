@@ -29,7 +29,8 @@ function generateDates(month, year) {
         const date = new Date(year, month - 2, i);
         const dayIndex = date.getDay();
         html += `<div id="prev-month" class="date prev-month"><div>
-        <span class="date_text">${i}</span>
+        <span class="date_text">
+        ${i}</span>
         <br>
         <span class="day_text">${dayNames[dayIndex]}</span></div>
         </div>`;
@@ -41,12 +42,13 @@ function generateDates(month, year) {
         const dayIndex = date.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
         const isToday = date.getDate() === new Date().getDate() && date.getMonth() === new Date().getMonth() && date.getFullYear() === new Date().getFullYear();
         if (dayIndex === 1 && i !== 1) {
-            html += `</div><div class="week" "data-date="${year}/${month}/${i}">`; // Start a new row for Monday
+            html += `</div><div class="week">`; // Start a new row for Monday
             weekCount++;
         }
-        let dateHtml = `<div class="date${isToday ? ' today-date' : ''}" data-date="${year}/${month-1}/${i}">
+        let dateHtml = `<div class="date${isToday ? ' today-date' : ''}">
         <div>
-        <span class="date_text">${i}</span>
+        <span class="date_text">
+        ${i}</span>
         <br>
         <span class="day_text">${dayNames[dayIndex]}</span></div>
         </div>`; // Include day of the week
@@ -66,7 +68,8 @@ function generateDates(month, year) {
         const date = new Date(year, month, i);
         const dayIndex = date.getDay();
         html += `<div id="next-month" class="date prev-month"><div>
-        <span class="date_text">${i}</span>
+        <span class="date_text">
+        ${i}</span>
         <br>
         <span class="day_text">${dayNames[dayIndex]}</span></div>
         </div>`;
@@ -81,8 +84,8 @@ function generateDates(month, year) {
             weeks[weeks.length - 1].remove();
         }
     }
-
-    addEventListeners();
+    console.log(weekCount)
+    addEventListeners()
 }
 
 // Weekday names array
@@ -98,52 +101,74 @@ function addEventListeners() {
             const dateText = dateElement.querySelector('.date_text');
             const date = dateText ? dateText.textContent : null;
             if (date) {
-                const selectedTask = document.querySelector('.task.selectedtask');
-                if (selectedTask) {
-                    const taskId = selectedTask.getAttribute('data-task-id');
-                    let taskDates = JSON.parse(localStorage.getItem(taskId)) || [];
-                    const clickedDate = dateElement.getAttribute('data-date');
-                    if (dateElement.classList.contains('selected')) {
-                        taskDates.push(clickedDate);
-                    } else {
-                        taskDates = taskDates.filter(d => d !== clickedDate);
+                let key;
+
+                // Determine whether the clicked date is from the previous month or next month
+                if (dateElement.id === 'prev-month') {
+                    currentMonth === 0 ? (key = `${currentYear - 1}_12_${date}`) : (key = `${currentYear}_${currentMonth}_${date}`);
+                } else if (dateElement.id === 'next-month') {
+                    currentMonth === 11 ? (key = `${currentYear + 1}_1_${date}`) : (key = `${currentYear}_${currentMonth + 2}_${date}`);// Save as the previous month
+                } else {
+                    key = `${currentYear}_${currentMonth + 1}_${date}`; // Save as the current month
+                }
+                console.log(currentMonth);
+                if (dateElement.classList.contains('selected')) {
+                    dateElement.innerHTML += '<span class="x-sign">X</span>';
+                    localStorage.setItem(key, 'selected');
+                    // Add your additional class lists here as needed
+                } else {
+                    const xSign = dateElement.querySelector('.x-sign');
+                    if (xSign) {
+                        xSign.remove();
                     }
-                    localStorage.setItem(taskId, JSON.stringify(taskDates));
+                    localStorage.removeItem(key);
+                    // Remove any additional class lists here if needed
                 }
             }
         });
 
-        const selectedTask = document.querySelector('.task.selectedtask');
-        if (selectedTask) {
-            const taskId = selectedTask.getAttribute('data-task-id');
-            const taskDates = JSON.parse(localStorage.getItem(taskId)) || [];
-            dateElements.forEach(dateElement => {
-                const date = dateElement.getAttribute('data-date');
-                if (taskDates.includes(date)) {
-                    dateElement.classList.add('selected');
-                }
-            });
+        // Check localStorage for saved selections on page load
+        const dateText = dateElement.querySelector('.date_text');
+        const date = dateText ? dateText.textContent : null;
+        if (date) {
+            let key;
+
+            // Determine whether the date is from the previous month or next month
+            if (dateElement.id === 'prev-month') {
+                currentMonth === 0 ? (key = `${currentYear - 1}_12_${date}`) : (key = `${currentYear}_${currentMonth}_${date}`); //this makes sure so the days remain selected even if years overlap so jan an dec of a 2 dif years
+            } else if (dateElement.id === 'next-month') {
+                currentMonth === 11 ? (key = `${currentYear + 1}_1_${date}`) : (key = `${currentYear}_${currentMonth + 2}_${date}`); // Check for the previous month
+            } else {
+                key = `${currentYear}_${currentMonth + 1}_${date}`; // Check for the current month
+            }
+
+            if (localStorage.getItem(key) === 'selected') {
+                dateElement.classList.add('selected');
+                dateElement.innerHTML += '<span class="x-sign">X</span>';
+                // Add your additional class lists here as needed
+            }
         }
     });
 }
 
-// Function to initialize date control
+let currentMonth;
+let currentYear;
 function initializeDateControl() {
     const control = document.getElementById('control');
     if (control) {
-        currentMonth = new Date().getMonth() + 1;
+        currentMonth = new Date().getMonth();
         currentYear = new Date().getFullYear();
 
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; // Define monthNames here
 
-        document.getElementById('month').textContent = monthNames[currentMonth - 1];
-        document.getElementById('next_month').textContent = monthNames[currentMonth % 12];
-        document.getElementById('prev_month').textContent = monthNames[(currentMonth - 2 + 12) % 12];
+        document.getElementById('month').textContent = monthNames[currentMonth];
+        document.getElementById('next_month').textContent = monthNames[(currentMonth + 1) % 12];
+        document.getElementById('prev_month').textContent = monthNames[(currentMonth - 1 + 12) % 12];
         document.getElementById('year').textContent = currentYear;
         document.getElementById('next_year').textContent = currentYear + 1;
         document.getElementById('prev_year').textContent = currentYear - 1;
-        generateDates(currentMonth, currentYear);
+        generateDates(currentMonth + 1, currentYear);
 
         control.addEventListener('wheel', function(event) {
             event.preventDefault();
@@ -151,75 +176,76 @@ function initializeDateControl() {
 
             if (event.target.classList.contains('moncon')) {
                 currentMonth -= delta;
-                if (currentMonth < 1) {
-                    currentMonth = 12;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
                     currentYear--;
                     document.getElementById('year').textContent = currentYear;
                     document.getElementById('next_year').textContent = currentYear + 1;
                     document.getElementById('prev_year').textContent = currentYear - 1;
-                } else if (currentMonth > 12) {
-                    currentMonth = 1;
+                } else if (currentMonth > 11) {
+                    currentMonth = 0;
                     currentYear++;
                     document.getElementById('year').textContent = currentYear;
                     document.getElementById('next_year').textContent = currentYear + 1;
                     document.getElementById('prev_year').textContent = currentYear - 1;
                 }
-                document.getElementById('month').textContent = monthNames[currentMonth - 1];
-                document.getElementById('next_month').textContent = monthNames[currentMonth % 12];
-                document.getElementById('prev_month').textContent = monthNames[(currentMonth - 2 + 12) % 12];
-                generateDates(currentMonth, currentYear);
+                document.getElementById('month').textContent = monthNames[currentMonth];
+                document.getElementById('next_month').textContent = monthNames[(currentMonth + 1) % 12];
+                document.getElementById('prev_month').textContent = monthNames[(currentMonth - 1 + 12) % 12];
+                generateDates(currentMonth + 1, currentYear);
 
             } else if (event.target.classList.contains('yearcon')) {
                 currentYear -= delta;
                 document.getElementById('year').textContent = currentYear;
                 document.getElementById('next_year').textContent = currentYear + 1;
                 document.getElementById('prev_year').textContent = currentYear - 1;
-                generateDates(currentMonth, currentYear);
+                generateDates(currentMonth + 1, currentYear);
             }
         });
     } else {
         console.error("Element with ID 'control' not found.");
     }
 
-    const todaySpan = document.getElementById('today');
-    if (todaySpan) {
-        // Define monthNames here as well
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+   const todaySpan = document.getElementById('today');
+if (todaySpan) {
+    // Define monthNames here as well
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-        todaySpan.addEventListener('click', () => {
-            const today = new Date();
-            const todayMonth = today.getMonth() + 1;
-            const todayYear = today.getFullYear();
-            const calendarDiv = document.querySelector('.calendar');
+    todaySpan.addEventListener('click', () => {
+        const today = new Date();
+        const todayMonth = today.getMonth();
+        const todayYear = today.getFullYear();
+        const calendarDiv = document.querySelector('.calendar');
 
-            // Update current month and year directly
-            currentMonth = todayMonth;
-            currentYear = todayYear;
+        // Update current month and year directly
+        currentMonth = todayMonth;
+        currentYear = todayYear;
 
-            // Update the display month and year
-            document.getElementById('month').textContent = monthNames[currentMonth - 1];
-            document.getElementById('next_month').textContent = monthNames[currentMonth % 12];
-            document.getElementById('prev_month').textContent = monthNames[(currentMonth - 2 + 12) % 12];
-            document.getElementById('year').textContent = currentYear;
-            document.getElementById('next_year').textContent = currentYear + 1;
-            document.getElementById('prev_year').textContent = currentYear - 1;
+        // Update the display month and year
+        document.getElementById('month').textContent = monthNames[currentMonth];
+        document.getElementById('next_month').textContent = monthNames[(currentMonth + 1) % 12];
+        document.getElementById('prev_month').textContent = monthNames[(currentMonth - 1 + 12) % 12];
+        document.getElementById('year').textContent = currentYear;
+        document.getElementById('next_year').textContent = currentYear + 1;
+        document.getElementById('prev_year').textContent = currentYear - 1;
 
-            // Smooth transition effect
-            calendarDiv.classList.add('transition');
-            
-            // Introduce a minimal delay before generating dates
+        // Smooth transition effect
+        calendarDiv.classList.add('transition');
+        
+        // Introduce a minimal delay before generating dates
+        setTimeout(() => {
+            generateDates(currentMonth + 1, currentYear);
+
+            // Remove transition class after the transition is done
             setTimeout(() => {
-                generateDates(currentMonth, currentYear);
-
-                // Remove transition class after the transition is done
-                setTimeout(() => {
-                    calendarDiv.classList.remove('transition');
-                }, 500);
-            }, 200); // Adjust the delay as needed
-        });
-    }
+                calendarDiv.classList.remove('transition');
+            }, );
+        }, ); // Adjust the delay as needed
+    });
 }
+}
+
 
 document.addEventListener('DOMContentLoaded', initializeDateControl);
 document.addEventListener('DOMContentLoaded', function() {
@@ -234,19 +260,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
         tasks.forEach(task => {
             const taskDiv = document.createElement('div');
-            const taskId = `task-${Math.floor(Math.random() * 1000000)}`;
             taskDiv.classList.add('task');
             taskDiv.setAttribute('draggable', true);
-            taskDiv.setAttribute('data-task-id', taskId);
             taskDiv.innerHTML = `<span>${task}</span>`;
             tasksDiv.appendChild(taskDiv);
-            const taskDates = JSON.parse(localStorage.getItem(taskId)) || [];
-            taskDates.forEach(date => {
-                const dateElement = document.querySelector(`.date[data-date="${date}"]`);
-                if (dateElement) {
-                    dateElement.classList.add('selected');
-                }
-            });
         });
         addDragAndDrop();
     }
@@ -263,10 +280,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add a new task
     addBtn.addEventListener('click', function() {
         const newTask = document.createElement('div');
-        const taskId = `task-${Math.floor(Math.random() * 1000000)}`;
         newTask.classList.add('task');
         newTask.setAttribute('draggable', true);
-        newTask.setAttribute('data-task-id', taskId);
         newTask.innerHTML = '<span>New Habit</span>';
         tasksDiv.appendChild(newTask);
         saveTasks();
@@ -281,16 +296,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const allTasks = document.querySelectorAll('.task');
                 allTasks.forEach(task => task.classList.remove('selectedtask'));
                 selectedTask.classList.add('selectedtask');
-                const taskId = selectedTask.getAttribute('data-task-id');
-                const taskDates = JSON.parse(localStorage.getItem(taskId)) || [];
-                document.querySelectorAll('.date').forEach(dateElement => {
-                    const date = dateElement.getAttribute('data-date');
-                    if (taskDates.includes(date)) {
-                        dateElement.classList.add('selected');
-                    } else {
-                        dateElement.classList.remove('selected');
-                    }
-                });
             }
         }
     });
@@ -299,10 +304,8 @@ document.addEventListener('DOMContentLoaded', function() {
     deleteBtn.addEventListener('click', function() {
         const selectedTask = document.querySelector('.task.selectedtask');
         if (selectedTask) {
-            const taskId = selectedTask.getAttribute('data-task-id');
             const nextTask = selectedTask.nextElementSibling || selectedTask.previousElementSibling;
             selectedTask.remove();
-            localStorage.removeItem(taskId);
             saveTasks();
             if (nextTask) {
                 nextTask.classList.add('selectedtask');
@@ -314,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function() {
     editBtn.addEventListener('click', function() {
         const selectedTask = document.querySelector('.task.selectedtask');
         if (selectedTask) {
-            selectedTask.setAttribute('draggable', false); // Make task non-draggable because u wanna change the name 
+            selectedTask.setAttribute('draggable', false); // Make task non-draggable because u wanna fix the name 
 
             const taskText = selectedTask.querySelector('span');
             const input = document.createElement('input');
