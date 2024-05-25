@@ -1,3 +1,66 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const plane = document.querySelector('.plane');
+    const shadow = document.createElement('div');
+    shadow.classList.add('shadow');
+    plane.parentElement.appendChild(shadow);
+
+    const updateShadow = (deltaX, deltaY, rect) => {
+        // Update shadow size
+        const shadowSizeX = rect.width * 1.1; // Slightly larger than the plane
+        const shadowSizeY = rect.height * 1; // Slightly larger than the plane
+        shadow.style.width = `${shadowSizeX}px`;
+        shadow.style.height = `${shadowSizeY}px`;
+
+        // Update shadow position
+        const shadowX = -deltaX / 20; // Adjust as needed
+        const shadowY = -deltaY / 20; // Adjust as needed
+        shadow.style.transform = `translate(calc(-50% + ${shadowX}px), calc(-50% + ${shadowY}px))`;
+
+        // Create a dynamic shadow effect with opacity gradient
+        const gradientX = (deltaX / rect.width) * 50;
+        const gradientY = (deltaY / rect.height) * 50;
+        shadow.style.background = `radial-gradient(circle at ${50 - gradientX}% ${50 - gradientY}%, rgba(0, 0, 0, 0.6), transparent)`;
+    };
+
+    plane.addEventListener('mousemove', (e) => {
+        const rect = plane.getBoundingClientRect();
+        const x = e.clientX - rect.left; // X coordinate within the element
+        const y = e.clientY - rect.top;  // Y coordinate within the element
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const deltaX = x - centerX;
+        const deltaY = y - centerY;
+
+        const maxRotation = 20; // Max rotation in degrees
+
+        const rotateX = (deltaY / centerY) * maxRotation;
+        const rotateY = -(deltaX / centerX) * maxRotation;
+
+        plane.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        updateShadow(deltaX, deltaY, rect);
+    });
+
+    plane.addEventListener('mouseleave', () => {
+        plane.style.transform = 'rotateX(0) rotateY(0)';
+        updateShadow(0, 0, plane.getBoundingClientRect());
+    });
+});
+
+document.getElementById('create').addEventListener('click', function() {
+    var startDiv = document.getElementById('start');
+    var gridDiv = document.getElementById('grid');
+    
+     gridDiv.style.display = "grid";
+            startDiv.style.display = "none";
+            gridDiv.classList.remove("slideOut");
+            gridDiv.classList.add("slideIn");
+            startDiv.classList.remove("scaleIn");
+            startDiv.classList.add("scaleOut");
+    const addBtn = document.getElementById("add");
+    addBtn.click();
+});
 // Function to get the number of days in a month
 function daysInMonth(month, year) {
   return new Date(year, month, 0).getDate();
@@ -288,11 +351,34 @@ function initializeDateControl() {
 
 document.addEventListener("DOMContentLoaded", initializeDateControl);
 document.addEventListener("DOMContentLoaded", function () {
-  const addBtn = document.getElementById("add");
-  const tasksDiv = document.getElementById("tasksdiv");
-  const deleteBtn = document.getElementById("delete");
-  const editBtn = document.getElementById("edit");
-
+    const addBtn = document.getElementById("add");
+    const tasksDiv = document.getElementById("tasksdiv");
+    const deleteBtn = document.getElementById("delete");
+    const editBtn = document.getElementById("edit");
+    const startDiv = document.getElementById("start");
+    const gridDiv = document.getElementById("grid");
+  
+    // Function to check if there are any tasks on page load
+    function checkTasks() {
+        const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        if (tasks.length === 0) {
+            gridDiv.style.display = "none";
+            startDiv.style.display = "flex";
+            gridDiv.classList.remove("slideIn");
+            gridDiv.classList.add("slideOut");
+            startDiv.classList.remove("scaleOut");
+            startDiv.classList.add("scaleIn");
+        } else {
+            gridDiv.style.display = "grid";
+            startDiv.style.display = "none";
+            gridDiv.classList.remove("slideOut");
+            gridDiv.classList.add("slideIn");
+            startDiv.classList.remove("scaleIn");
+            startDiv.classList.add("scaleOut");
+        }
+    }
+  
+   
   // Function to load tasks(habit) from localStorage
   // Function to load tasks from localStorage
   function loadTasks() {
@@ -327,6 +413,7 @@ document.addEventListener("DOMContentLoaded", function () {
         displaySelectedDates(selectedTask);
       }
     });
+    checkTasks();
     addDragAndDrop();
   }
 
@@ -344,7 +431,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // Add a new task
   addBtn.addEventListener("click", function () {
     const newTask = document.createElement("div");
-    const taskId = `task-${Math.floor(Math.random() * 100)}`;
+    let taskId;
+    do {
+        taskId = `task-${Math.floor(Math.random() * 100)}`;
+    } while (document.querySelector(`[data-task-id="${taskId}"]`)); // Check if ID already exists
     newTask.classList.add("task");
     newTask.setAttribute("draggable", true);
     newTask.setAttribute("data-task-id", taskId);
@@ -358,7 +448,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //this below send the task to selectedtask
     const selectedTaskId = newTask.getAttribute("data-task-id");
     const selectedTaskIds =
-      JSON.parse(localStorage.getItem("selectedTasks")) || [];
+        JSON.parse(localStorage.getItem("selectedTasks")) || [];
     // Clear the array before adding the new selected task
     selectedTaskIds.length = 0;
     selectedTaskIds.push(selectedTaskId);
@@ -366,8 +456,7 @@ document.addEventListener("DOMContentLoaded", function () {
     displaySelectedDates(newTask);
     saveTasks();
     addDragAndDrop();
-  });
-
+});
   // Function to display selected dates for a given task
   function displaySelectedDates(selectedTask) {
     if (!selectedTask) return;
@@ -434,6 +523,7 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("selectedTasks", JSON.stringify(selectedTaskIds));
       }
     }
+    checkTasks();
   });
 
   // Edit a selected task
