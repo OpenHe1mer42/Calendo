@@ -9,7 +9,7 @@ body{
     outline: none;
 }
 html{
-    scrollbar-color: rgb(19, 25, 36) #010508;
+    scrollbar-color: rgba(209, 209, 209, 0.301) #010508;
     scrollbar-width: thin;
 }
 .start {
@@ -218,13 +218,11 @@ html{
    margin-top: 40px;
    overflow-y: scroll;
    overflow-x: hidden;
-   scrollbar-color: rgb(19, 25, 36) #010508;
+   scrollbar-color: rgba(209, 209, 209, 0.301) #010508;
   scrollbar-width: thin;
+
 }
-#tasksdiv::-webkit-scrollbar-thumb {
-    background-color: #888; /* Set the color of the scrollbar thumb */
-    border-radius: 10px; /* Add border radius */
-  }
+
 .task-menu{
     margin-top: 10px;
     height: 12%;
@@ -350,6 +348,16 @@ html{
     transition: transform 0.3s, box-shadow 0.3s;
     cursor: pointer;
 }
+.date.clicked {
+    animation: clickAnimation 0.4s;
+  }
+  
+  @keyframes clickAnimation {
+    0% { transform: scale(1.6); }
+    50% { transform: scale(1); }
+    100% { transform: scale(1.6); }
+  }
+
 .today-date {
     border: 2px solid #b4b4b4 !important;
     background-color: #0105086c;

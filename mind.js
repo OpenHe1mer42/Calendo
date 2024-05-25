@@ -181,6 +181,10 @@ function addEventListeners() {
       // Add or remove the <span class="x-sign">X</span>
       if (dateElement.classList.contains("selected")) {
         dateElement.innerHTML += '<span class="x-sign">X</span>';
+        dateElement.classList.add("clicked");
+         setTimeout(function() {
+          element.classList.remove("clicked");
+         }, 500);
       } else {
         const xSign = dateElement.querySelector(".x-sign");
         if (xSign) {
