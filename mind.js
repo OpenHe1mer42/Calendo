@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create a dynamic shadow effect with opacity gradient
         const gradientX = (deltaX / rect.width) * 50;
         const gradientY = (deltaY / rect.height) * 50;
-        shadow.style.background = `radial-gradient(circle at ${50 - gradientX}% ${50 - gradientY}%, rgba(0, 0, 0, 0.6), transparent)`;
+        shadow.style.background = `radial-gradient(circle at ${50 - gradientX}% ${50 - gradientY}%, rgba(0, 0, 0, 0.9), transparent)`;
     };
 
     plane.addEventListener('mousemove', (e) => {
