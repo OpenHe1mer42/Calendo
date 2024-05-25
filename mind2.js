@@ -28,7 +28,9 @@ function generateDates(month, year) {
     for (let i = daysInPrevMonth - daysFromPrevMonth + 1; i <= daysInPrevMonth; i++) {
         const date = new Date(year, month - 2, i);
         const dayIndex = date.getDay();
-        html += `<div id="prev-month" class="date prev-month"><div>
+        let key;
+        currentMonth === 0 ? (key = `${currentYear - 1}_12_${i}`) : (key = `${currentYear}_${currentMonth}_${i}`);
+        html += `<div id="prev-month" class="date prev-month" data-date="${key}"><div>
         <span class="date_text">
         ${i}</span>
         <br>
@@ -45,7 +47,9 @@ function generateDates(month, year) {
             html += `</div><div class="week">`; // Start a new row for Monday
             weekCount++;
         }
-        let dateHtml = `<div class="date${isToday ? ' today-date' : ''}">
+        let key;
+        key = `${currentYear}_${currentMonth + 1}_${i}`;
+        let dateHtml = `<div class="date${isToday ? ' today-date' : ''}" data-date="${key}">
         <div>
         <span class="date_text">
         ${i}</span>
@@ -67,7 +71,9 @@ function generateDates(month, year) {
     for (let i = 1; i <= daysFromNextMonth; i++) {
         const date = new Date(year, month, i);
         const dayIndex = date.getDay();
-        html += `<div id="next-month" class="date prev-month"><div>
+        let key;
+        currentMonth === 11 ? (key = `${currentYear + 1}_1_${i}`) : (key = `${currentYear}_${currentMonth + 2}_${i}`);
+        html += `<div id="next-month" class="date prev-month" data-date="${key}"><div>
         <span class="date_text">
         ${i}</span>
         <br>
@@ -101,77 +107,39 @@ function addEventListeners() {
             const dateText = dateElement.querySelector('.date_text');
             const date = dateText ? dateText.textContent : null;
             if (date) {
-                let key;
                 const selectedTask = document.querySelector('.task.selectedtask');
-                const trimmedDate = date.trim();
-                // Determine whether the clicked date is from the previous month or next month
-                if (dateElement.id === 'prev-month') {
-                    currentMonth === 0 ? (key = `${currentYear - 1}_12_${trimmedDate}`) : (key = `${currentYear}_${currentMonth}_${trimmedDate}`);
-                } else if (dateElement.id === 'next-month') {
-                    currentMonth === 11 ? (key = `${currentYear + 1}_1_${trimmedDate}`) : (key = `${currentYear}_${currentMonth + 2}_${trimmedDate}`);// Save as the previous month
-                } else {
-                    key = `${currentYear}_${currentMonth + 1}_${trimmedDate}`; // Save as the current month
-                }
-                console.log(date);
                 if (selectedTask) {
                     const taskId = selectedTask.getAttribute('data-task-id');
                     let taskDates = JSON.parse(localStorage.getItem(taskId)) || [];
-                   
+                    const clickedDate = dateElement.getAttribute('data-date');
                     if (dateElement.classList.contains('selected')) {
-                        taskDates.push(key);
+                        taskDates.push(clickedDate);
                     } else {
-                        taskDates = taskDates.filter(d => d !== key);
-                        
+                        taskDates = taskDates.filter(d => d !== clickedDate);
                     }
                     localStorage.setItem(taskId, JSON.stringify(taskDates));
                 }
-
-                //this stays here to make the x sign cuz i cant figure out a better way to get involed in hte 
-                if (dateElement.classList.contains('selected')) {
-                    dateElement.innerHTML += '<span class="x-sign">X</span>';
-                   
-                    
-                } else {
-                    const xSign = dateElement.querySelector('.x-sign');
-                    if (xSign) {
-                        xSign.remove();
-                    }
-                    localStorage.removeItem(key);
-                    
-                }
             }
         });
-
-        // Check localStorage for saved selections on page load
+        // this above hangels the adding of the task to local storage 
+        //this below handels the style thats added to the selected
         const selectedTask = document.querySelector('.task.selectedtask');
-        const dateText = dateElement.querySelector('.date_text');
-        const date = dateText ? dateText.textContent : null;
-        if (date) {
-            let key;
-
-            // Determine whether the date is from the previous month or next month
-            if (dateElement.id === 'prev-month') {
-                currentMonth === 0 ? (key = `${currentYear - 1}_12_${date}`) : (key = `${currentYear}_${currentMonth}_${date}`); //this makes sure so the days remain selected even if years overlap so jan an dec of a 2 dif years
-            } else if (dateElement.id === 'next-month') {
-                currentMonth === 11 ? (key = `${currentYear + 1}_1_${date}`) : (key = `${currentYear}_${currentMonth + 2}_${date}`); // Check for the previous month
-            } else {
-                key = `${currentYear}_${currentMonth + 1}_${date}`; // Check for the current month
-            }
-            if (selectedTask) {
-                const taskId = selectedTask.getAttribute('data-task-id');
-                const taskDates = JSON.parse(localStorage.getItem(taskId)) || [];
-                dateElements.forEach(dateElement => {
-                   
-                    if (taskDates.includes(key)) {
-                        dateElement.classList.add('selected');
-                        dateElement.innerHTML += '<span class="x-sign">X</span>';
-                    }
-                });
-            }
-           
+        if (selectedTask) {
+            const taskId = selectedTask.getAttribute('data-task-id');
+            const taskDates = JSON.parse(localStorage.getItem(taskId)) || [];
+            dateElements.forEach(dateElement => {
+                const date = dateElement.getAttribute('data-date');
+                if (taskDates.includes(date)) {
+                    dateElement.classList.add('selected');
+                    dateElement.innerHTML += '<span class="x-sign">X</span>';
+                }else {
+                    
+                }
+            });
         }
     });
 }
+
 
 let currentMonth;
 let currentYear;
@@ -236,7 +204,7 @@ if (todaySpan) {
 
     todaySpan.addEventListener('click', () => {
         const today = new Date();
-        const todayMonth = today.getMonth();
+        const todayMonth = today.getMonth();//this has +1?
         const todayYear = today.getFullYear();
         const calendarDiv = document.querySelector('.calendar');
 
@@ -282,13 +250,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
         tasks.forEach(task => {
             const taskDiv = document.createElement('div');
+            const taskId = `task-${Math.floor(Math.random() * 100)}`;
             taskDiv.classList.add('task');
             taskDiv.setAttribute('draggable', true);
+            taskDiv.setAttribute('data-task-id', taskId);
             taskDiv.innerHTML = `<span>${task}</span>`;
             tasksDiv.appendChild(taskDiv);
+            const taskDates = JSON.parse(localStorage.getItem(taskId)) || [];
+            taskDates.forEach(date => {
+                const dateElement = document.querySelector(`.date[data-date="${date}"]`);
+                if (dateElement) {
+                    dateElement.classList.add('selected');
+                }
+            });
         });
         addDragAndDrop();
     }
+
 
     // Function to save tasks to localStorage
     function saveTasks() {
@@ -302,8 +280,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add a new task
     addBtn.addEventListener('click', function() {
         const newTask = document.createElement('div');
+        const taskId = `task-${Math.floor(Math.random() * 100)}`;
         newTask.classList.add('task');
         newTask.setAttribute('draggable', true);
+        newTask.setAttribute('data-task-id', taskId);
         newTask.innerHTML = '<span>New Habit</span>';
         tasksDiv.appendChild(newTask);
         saveTasks();
@@ -318,6 +298,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const allTasks = document.querySelectorAll('.task');
                 allTasks.forEach(task => task.classList.remove('selectedtask'));
                 selectedTask.classList.add('selectedtask');
+                const taskId = selectedTask.getAttribute('data-task-id');
+                const taskDates = JSON.parse(localStorage.getItem(taskId)) || [];
+                document.querySelectorAll('.date').forEach(dateElement => {
+                    const date = dateElement.getAttribute('data-date');
+                    if (taskDates.includes(date)) {
+                        dateElement.classList.add('selected');
+                        
+                    } else {
+                        dateElement.classList.remove('selected');
+                    }
+                });
             }
         }
     });
@@ -326,8 +317,10 @@ document.addEventListener('DOMContentLoaded', function() {
     deleteBtn.addEventListener('click', function() {
         const selectedTask = document.querySelector('.task.selectedtask');
         if (selectedTask) {
+            const taskId = selectedTask.getAttribute('data-task-id');
             const nextTask = selectedTask.nextElementSibling || selectedTask.previousElementSibling;
             selectedTask.remove();
+            localStorage.removeItem(taskId);
             saveTasks();
             if (nextTask) {
                 nextTask.classList.add('selectedtask');
